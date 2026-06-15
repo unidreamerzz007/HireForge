@@ -1,110 +1,145 @@
-# Intelligent Candidate Discovery & Ranking System
-## Foundational AI Matcher for Senior AI Engineer @ Redrob AI
-### Designed and Developed by Antigravity-Talent-AI
+# Idea Submission Template | Redrob
+## Team Name: HireForge
+## Problem Statement: Intelligent Candidate Discovery & Ranking at Scale (100K profiles) for a Senior AI Engineer role without keyword-stuffing bias, while bypassing impossible honeypot profiles.
+## Team Leader Name: Adhi
 
 ---
 
-## Slide 1: Executive Summary
-### The Problem: Why Traditional Hiring Fails
-- **Keyword Stuffing**: Candidates listing dozens of popular AI skills (RAG, Pinecone, LLMs) but possessing zero actual experience or holding entirely unrelated roles (e.g. Marketing Manager).
-- **Honeypots**: Subtly impossible synthetic profiles designed to catch keyword-based embedders (e.g. 8 years at a company founded 3 years ago).
-- **Stale Leads**: Perfect-on-paper candidates who haven't logged in for months and are practically unavailable.
+## Slide 2: Solution Overview
+### What is your proposed solution?
+- **HireForge**: A multi-stage, high-precision candidate discovery, filtering, and scoring pipeline.
+- It parses candidate histories, filters out temporal anomalies, scores experience/technical depth/product culture fit, and applies a behavioral multiplier representing actual candidate availability.
 
-### The Solution: Human-in-the-Loop Emulation
-We built an offline, multi-stage heuristic ranking system that prioritizes actual candidate intent, technical depth, product culture, and availability, running in **under 20 seconds** on CPU.
+### What differentiates your approach from traditional candidate matching systems?
+- **Context over Keywords**: Traditional systems match strings (e.g. finding "RAG" in marketing profiles). HireForge evaluates title relevance, applied ML tenure, and technical depth.
+- **Behavioral Intelligence**: Incorporates platform engagement (last login recency, recruiter response rates, and interview completion rates) to prioritize candidates who are actually available and responsive.
+- **Zero-Trust Validation**: Features a programmatic anomaly scanner that detects and excludes impossible synthetic profiles (honeypots).
 
 ---
 
-## Slide 2: High-Level Architecture
+## Slide 3: JD Understanding & Candidate Evaluation
+### What are the key requirements extracted from the JD?
+- **Target Profile**: Senior AI Engineer (Founding Team).
+- **Experience**: 5–9 years total experience (6–8 yrs ideal), with 4–5 years in applied ML/AI roles (NLP/IR focus).
+- **Core Stack**: Embeddings-based retrieval systems (Sentence Transformers, BGE) and Vector Databases (Faiss, Milvus, Qdrant, Pinecone).
+- **Key Exclusions**: Pure academic researchers, LangChain-only developers under 12 months, job-hoppers, and consulting-only careers (TCS, Wipro, Infosys, etc.).
+
+### How does your solution evaluate candidate fit beyond keyword matching?
+- **Blocked Title List**: Disqualifies candidates in unrelated domains (marketing, HR, sales, accounting) who stuff keywords.
+- **Applied ML Tenure**: Scans descriptions to calculate years spent inside AI/ML projects rather than overall career duration.
+- **Company Category Score**: Rewards candidates with product startup (e.g. Swiggy, CRED, Sarvam AI) or Big Tech experience; penalizes consulting firms.
+- **Skill Proficiency Weights**: Evaluates named skills weighted by proficiency level ("expert" vs "intermediate") and use duration.
+
+---
+
+## Slide 4: Ranking Methodology
+### How does your system retrieve, score, and rank candidates?
+- **Retrieval & Scoring (Stage 1 & 2)**: Candidates are filtered for eligibility, then scored out of a raw **80 points** across:
+  - Experience Match (10 pts) + ML Tenure (10 pts) + Title Match (10 pts) + Company context (15 pts) + Location preference (10 pts) + Notice period (5 pts) + Skills depth (25 pts) - Job-Hopping Penalty.
+- **Behavioral Adjustment (Stage 3)**:
+  - $\text{Final Score} = \text{Raw Score} \times (A \times R \times O \times I \times S)$
+  - *Activity ($A$)*: Scales down if inactive (within 30 days = 1.0, >180 days = 0.3).
+  - *Response ($R$)*: $0.5 + 0.5 \times \text{response\_rate}$.
+  - *Open-to-Work ($O$)*: $1.1\times$ boost.
+  - *Interview attendance ($I$)*: Scales with completion rate.
+- **Tie-Breaking**: Deterministic secondary ordering using candidate ID ascending, ensuring unique ranks from 1 to 100.
+
+---
+
+## Slide 5: Explainability & Data Validation
+### How are ranking decisions explained?
+- We generate a customized, non-templated reasoning string for each candidate, detailing their title, years of experience, specific ML/search skills matching the profile, and past company context (e.g. "Search Engineer with 7.6 years of experience. Strong skills in Weaviate, Milvus, RAG; shipped product systems at Sarvam AI...").
+
+### How do you prevent hallucinations or unsupported justifications?
+- Explanations are constructed *strictly* from the candidate's verified fields (current title, stated years of experience, named skills list, and parsed career companies). No generative LLM is used during ranking, preventing hallucinations and satisfying the offline budget constraints.
+
+### How does your solution handle inconsistent, low-quality, or suspicious profiles?
+- Pre-computation script ([find_all_honeypots_precise.py](file:///c:/Users/Adhi/OneDrive/Desktop/Hackathon/India_runs_data_and_ai_challenge/find_all_honeypots_precise.py)) programmatically scans and caches **330 anomalous candidates** (date inversions, zero-duration expert skills, or impossible timelines starting at Krutrim/Sarvam AI before they were founded in 2023, or CRED before 2018). These are completely bypassed during ranking.
+
+---
+
+## Slide 6: End-to-End Workflow
+### What is the complete workflow from JD input to ranked candidate output?
 ```
-[100,000 Candidates Pool]
-         │
-         ▼
- ┌───────────────┐
- │ Stage 1:      │  ◄── Excludes: Honeypots, Consulting-only, job-hoppers,
- │ Hard Filters  │      and CV/speech-only profiles with no NLP/IR.
- └───────┬───────┘
-         │ (High quality engineering subset)
-         ▼
- ┌───────────────┐
- │ Stage 2:      │  ◄── Evaluates: Experience (5-9 yrs sweet spot), title match,
- │ Raw Scoring   │      ML/AI keyword depth, product/startup background, location.
- └───────┬───────┘
-         │ (Raw heuristic score)
-         ▼
- ┌───────────────┐
- │ Stage 3:      │  ◄── Modifies score based on: last active date, recruiter
- │ Bio-Modifier  │      response rate, open-to-work, and interview attendance.
- └───────┬───────┘
-         │ (Final Score)
-         ▼
-[Deterministic Ranker] ──► [Final Top 100 Shortlist]
+  [Ingest Candidate Pool]
+             │
+             ▼
+  [Check Anomalous List] ──────────► (If anomalous, discard candidate)
+             │
+             ▼
+  [Extract Profile Fields] ────────► (Verify non-blocked title, non-consulting only)
+             │
+             ▼
+  [Compute Heuristic Scores] ──────► (Experience, Title, ML Tenure, Tech Skills, Location)
+             │
+             ▼
+  [Apply Behavioral Multipliers] ──► (Activity recency, response rates, open to work)
+             │
+             ▼
+  [Deterministic Sorting] ────────► (Sort descending by score, tie-break by ID ascending)
+             │
+             ▼
+  [Reasoning & Output] ───────────► (Generate reasoning, write top 100 to submission.csv)
 ```
 
 ---
 
-## Slide 3: Stage 1 — Anomaly & Honeypot Detection
-### Finding the "Subtly Impossible" Profiles
-We programmatically identified **330 anomalous profiles** across 100,000 candidates:
-1. **Startup founding violations**:
-   - *Krutrim*: Founded Dec 2023. Flagged any candidate starting before Dec 2023 (e.g., 52 months duration starting 2018).
-   - *Sarvam AI*: Founded July 2023. Flagged any candidate starting before July 2023.
-   - *CRED*: Founded April 2018. Flagged any candidate starting before April 2018 (211 candidates detected).
-2. **Date Inversions**:
-   - Candidates with career/education start dates occurring *after* their end dates.
-3. **Skill Duration Conflicts**:
-   - Candidates listing "Expert" proficiency in multiple skills but having exactly `0` months of duration.
-
-*Result*: 100% elimination of honeypots in our shortlist, satisfying the strict `< 10%` disqualification rule.
-
----
-
-## Slide 4: Stage 2 — Heuristic Scoring Alignment
-Candidates are scored out of **80 points** based on the Job Description's semantic needs:
-- **Years of Experience (10 pts)**: Sweet spot is 6–8 years (10 pts), tapering off at 5.0 and 9.0 (8 pts), and 3.0 or 13.0 (2 pts).
-- **Applied ML Experience (10 pts)**: Scans career history to calculate total tenure specifically inside ML/AI roles (4-5 yrs is ideal).
-- **Title Match (10 pts)**: Exact AI/ML titles get 10 pts; adjacent engineering titles (Backend, Data) get 4 pts; unrelated titles are blocked.
-- **Company Context (15 pts)**: Upgrades candidates with product company / startup background (Swiggy, Flipkart, CRED, Wayne Enterprises) and AI startups (Sarvam, Krutrim, Observe.AI). Penalizes pure IT consulting backgrounds.
-- **Technical Skills Depth (25 pts)**: Dynamic scoring based on keyword proficiency and duration (Information Retrieval, Vector Search, FAISS, Pinecone, RAG, fine-tuning, LoRA, and ranking metrics MAP/NDCG).
-- **Location & Relocation (10 pts)**: Max score for Pune/Noida residents, or tier-1 relocation candidates (willing_to_relocate = True).
-
----
-
-## Slide 5: Stage 3 — Behavioral Modifier (Recruiter Instinct)
-A perfect candidate is useless if they don't respond. The raw heuristic score is multiplied by the **Behavioral Modifier**:
-$$\text{Final Score} = \text{Raw Score} \times (A \times R \times O \times I \times S)$$
-
-- **Activity Multiplier ($A$)**: Scales down if inactive (within 30 days = 1.0, 90 days = 0.9, 180 days = 0.7, >180 days = 0.3).
-- **Response Multiplier ($R$)**: $0.5 + 0.5 \times \text{recruiter\_response\_rate}$.
-- **Open-to-Work Multiplier ($O$)**: $1.1\times$ boost if flag is True.
-- **Interview Attendance ($I$)**: $0.7 + 0.3 \times \text{interview\_completion\_rate}$ (penalizes no-shows).
-- **Offer Acceptance ($S$)**: Scales based on historical acceptance rates.
+## Slide 7: System Architecture
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│                              HIREFORGE                                 │
+└──────────────────────────────────┬─────────────────────────────────────┘
+                                   │
+         ┌─────────────────────────┼─────────────────────────┐
+         ▼                         ▼                         ▼
+┌─────────────────┐       ┌─────────────────┐       ┌─────────────────┐
+│  Stage 1: Filter│       │  Stage 2: Score │       │ Stage 3: Modify │
+├─────────────────┤       ├─────────────────┤       ├─────────────────┤
+│ • Anomalous list│       │ • Exp: 5-9 yrs  │       │ • Activity mult │
+│ • Blocked titles│       │ • ML tenure yrs │       │ • Response mult │
+│ • Consulting    │       │ • Startup/BigTec│       │ • Open-to-work  │
+│ • CV/Speech-only│       │ • Tech skills   │       │ • Interview comp│
+└─────────────────┘       └─────────────────┘       └─────────────────┘
+                                   │
+                                   ▼
+                       ┌──────────────────────┐
+                       │ Sorting & Formatting │
+                       ├──────────────────────┤
+                       │ • Deterministic sort │
+                       │ • Reasoning gen      │
+                       └───────────┬──────────┘
+                                   │
+                                   ▼
+                       ┌──────────────────────┐
+                       │    submission.csv    │
+                       └──────────────────────┘
+```
 
 ---
 
-## Slide 6: The Final Shortlist
-### Top 5 Recommended Candidates
+## Slide 8: Results & Performance
+### What results or insights demonstrate ranking quality?
+- The top-ranked candidate (`CAND_0077337`) is a Staff ML Engineer with 7.0 years of experience, possessing core vector search skills (Pinecone, Qdrant), startup product experience, Pune location preference, and a 95% response rate.
+- The shortlist contains zero honeypots (0% error rate).
 
-1. **CAND_0077337 (Staff ML Engineer — Score: 73.34)**
-   - *Experience*: 7.0 Years | *Skills*: Pinecone, Qdrant, OpenSearch, RAG, PyTorch.
-   - *Why*: Product background, strong search & vector search skills, highly active and Pune-based.
-2. **CAND_0064326 (Search Engineer — Score: 72.45)**
-   - *Experience*: 7.6 Years | *Skills*: Weaviate, Milvus, RAG, PyTorch.
-   - *Why*: Shipped retrieval systems at Sarvam AI, excellent response rate, Noida-based.
-3. **CAND_0050454 (AI Engineer — Score: 68.66)**
-   - *Experience*: 6.8 Years | *Skills*: Qdrant, FAISS, NLP, PyTorch, LoRA.
-   - *Why*: Shipped product systems at Rephrase.ai, active candidate.
-4. **CAND_0030031 (AI Engineer — Score: 66.77)**
-   - *Experience*: 5.7 Years | *Skills*: Milvus, NLP, RAG, PyTorch, LoRA.
-   - *Why*: Shipped product systems at Microsoft, willing to relocate.
-5. **CAND_0079064 (Senior Data Scientist — Score: 63.87)**
-   - *Experience*: 5.2 Years | *Skills*: Pinecone, OpenSearch, NLP, PyTorch, LoRA.
-   - *Why*: Product company experience, willing to relocate.
+### How does your solution meet the challenge's runtime and compute constraints?
+- **Runtime**: Runs in **16 seconds** on a standard CPU for the entire 100K candidates (limit: 5 minutes).
+- **RAM**: Under **200 MB** execution memory (limit: 16 GB).
+- **Offline**: Zero external network requests or API calls during execution (fully offline).
 
 ---
 
-## Slide 7: Engineering Performance & Scale
-- **Execution Time**: **16 seconds** to scan, parse, filter, and score all 100,000 candidates.
-- **Memory Footprint**: Under **200 MB RAM** during execution (easily fitting the 16 GB constraint).
-- **Zero Latency Regression**: Runs entirely locally and offline, meaning zero dependence on flaky external APIs.
-- **Deterministic and Reproducible**: Tiebreaks are handled using candidate_id ascending, ensuring identical rankings on any execution.
+## Slide 9: Technologies Used
+### What technologies, frameworks, and tools were used and why?
+- **Python (Standard Library)**: Used for the core ranking engine (`json`, `re`, `csv`, `math`, `datetime`, `pathlib`). We selected vanilla Python to ensure sub-20s speed, zero package footprint, and complete CPU compliance.
+- **python-docx**: Used during initial setup to programmatically read job description files.
+- **Git**: Used for tracking code iterations and pushing to GitHub.
+
+---
+
+## Slide 10: Submission Assets
+### Assets & Links
+- **GitHub Repository**: [https://github.com/unidreamerzz007/HireForge](https://github.com/unidreamerzz007/HireForge)
+- **Sandbox/Demo Link**: [https://huggingface.co/spaces/unidreamerzz007/HireForge-Demo](https://huggingface.co/spaces/unidreamerzz007/HireForge-Demo)
+- **Reproduce Command**: `python rank.py`
+- **Output File**: [submission.csv](file:///c:/Users/Adhi/OneDrive/Desktop/Hackathon/India_runs_data_and_ai_challenge/submission.csv)
