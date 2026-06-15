@@ -23,10 +23,9 @@ Our solution addresses these issues by using a **Multi-Stage Heuristic Scoring a
 *   `rank.py` - Core ranking system that reads `candidates.jsonl`, scores all candidates, and generates the final `submission.csv`.
 *   `submission.csv` - The output file containing the top 100 ranked candidates.
 *   `submission_metadata.yaml` - Required portal metadata.
-*   `approach_presentation.md` - Presentation slides explaining our methodology and results.
 *   `validate_submission.py` - Official validation script to check compliance.
 *   `anomalous_candidate_ids.json` - Cached JSON containing all detected anomalous candidate profiles.
-*   `honeypot_scanner.py` - Script used to scan and detect honeypots.
+*   `find_all_honeypots_precise.py` - Script used to scan and detect anomalous/honeypot candidates.
 
 ---
 
