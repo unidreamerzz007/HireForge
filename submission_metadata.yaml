@@ -1,0 +1,54 @@
+# Redrob Hackathon — Submission Metadata
+# Filename: submission_metadata.yaml
+
+team_name: "Antigravity-Talent-AI"  # Used in leaderboard and announcements
+
+primary_contact:
+  name: "Adhi"
+  email: "adhi@example.com"
+  phone: "+91-9876543210"
+
+team_members:
+  - name: "Adhi"
+    email: "adhi@example.com"
+    role: "Team Lead & ML Architect"
+
+github_repo: "https://github.com/Adhi/redrob-candidate-ranker"
+
+sandbox_link: "https://huggingface.co/spaces/Adhi/redrob-candidate-ranker"
+
+reproduce_command: "python rank.py"
+
+compute:
+  platform: "Local PC"
+  cpu_cores: 8
+  ram_gb: 16
+  python_version: "3.10.11"
+  os: "Windows 11"
+  uses_gpu_for_inference: false
+  has_network_during_ranking: false
+  pre_computation_required: false
+  pre_computation_time_minutes: 0
+
+ai_tools_used:
+  - "Claude"
+  - "Cursor"
+  - "Gemini"
+
+ai_usage_summary: |
+  Used Claude and Gemini for brainstorming, code review, and structural refactoring.
+  No candidate data was shared with external API endpoints. The ranking pipeline runs fully locally and offline on CPU within 20 seconds.
+
+methodology_summary: |
+  A multi-stage, high-precision candidate discovery and ranking system. 
+  1. Hard filters to disqualify honeypots (330 impossible timelines and skill inconsistencies identified), consulting-only profiles, and keyword stuffers (unrelated titles/headlines).
+  2. Multi-feature heuristic scoring based on candidate experience alignment (5-9 years sweet spot), current title relevance, detailed ML/AI/Retrieval/Search skill proficiency and tenure, product/startup company background, and location/relocation preferences.
+  3. Multiplicative behavioral signal multipliers based on last login activity, response rates, and open to work flags to score candidates by actual availability.
+  Runs in ~16 seconds for 100K candidates on CPU.
+
+declarations:
+  read_submission_spec: true
+  code_is_original_work: true
+  no_collusion: true
+  honeypot_check_done: true
+  reproduction_tested: true
