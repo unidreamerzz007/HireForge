@@ -1,7 +1,7 @@
 # Idea Submission Template | Redrob
 ## Team Name: HireForge
 ## Problem Statement: Intelligent Candidate Discovery & Ranking at Scale (100K profiles) for a Senior AI Engineer role without keyword-stuffing bias, while bypassing impossible honeypot profiles.
-## Team Leader Name: Adhi
+## Team Leader Name: Adithya Anil
 
 ---
 
@@ -140,6 +140,6 @@
 ## Slide 10: Submission Assets
 ### Assets & Links
 - **GitHub Repository**: [https://github.com/unidreamerzz007/HireForge](https://github.com/unidreamerzz007/HireForge)
-- **Sandbox/Demo Link**: [https://huggingface.co/spaces/unidreamerzz007/HireForge-Demo](https://huggingface.co/spaces/unidreamerzz007/HireForge-Demo)
+- **Sandbox/Demo Link**: [https://hireforge-8sypzgojbfysbcrbhkycvc.streamlit.app/](https://hireforge-8sypzgojbfysbcrbhkycvc.streamlit.app/)
 - **Reproduce Command**: `python rank.py`
-- **Output File**: [submission.csv](file:///c:/Users/Adhi/OneDrive/Desktop/Hackathon/India_runs_data_and_ai_challenge/submission.csv)
+- **Output File**: [submission.csv]

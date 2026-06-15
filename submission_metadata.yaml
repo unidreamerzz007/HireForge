@@ -15,7 +15,7 @@ team_members:
 
 github_repo: "https://github.com/unidreamerzz007/HireForge"
 
-sandbox_link: "https://huggingface.co/spaces/Adhi/redrob-candidate-ranker"
+sandbox_link: "https://hireforge-8sypzgojbfysbcrbhkycvc.streamlit.app/"
 
 reproduce_command: "python rank.py"
 
